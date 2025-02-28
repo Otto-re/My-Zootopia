@@ -13,16 +13,19 @@ with open("animals_template.html", "r") as file:
 
 output_animals = ''
 for animal in animals_data:
-    output_animals += '<li class="cards__item">'
-    output_animals += f"Name: {animal['name']}<br/>\n"
-    output_animals += f"Diet: {animal['characteristics']['diet']}<br/>\n"
-    output_animals += f"Location: {animal['locations'][0]}<br/>\n"
+    output_animals += '<li class="cards__item">\n'
+    output_animals += f"<div class={"card__title"}>{animal['name']}</div>\n"
+    output_animals += '<p class="card__text">\n'
+    output_animals += f"<strong>Diet:</strong> {animal['characteristics']['diet']}<br/>\n"
+    output_animals += f"<strong>Location:</strong> {animal['locations'][0]}<br/>\n"
 
     if "characteristics" in animal and "type" in animal["characteristics"]:
-        output_animals += f"Type: {animal['characteristics']['type']}<br/>\n"
+        output_animals += f"<strong>Type:</strong> {animal['characteristics']['type']}<br/>\n"
 
-    output_animals += "<br/>\n"
-    output_animals += '</li>'
+    output_animals += '</p>\n'
+    output_animals += '</li>\n'
+    output_animals += "\n"
+
 
 html_content = template_content.replace("__REPLACE_ANIMALS_INFO__", output_animals)
 
