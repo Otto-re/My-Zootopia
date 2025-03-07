@@ -1,4 +1,5 @@
 import data_fetcher
+import os
 
 
 def escape_html(text):
@@ -15,52 +16,41 @@ def serialize_animal(animal):
     if 'characteristics' in animal and 'diet' in animal['characteristics']:
         output_animals += f"<strong>Diet:</strong> {escape_html(animal['characteristics']['diet'])}<br/>\n"
 
-    if 'locations' in animal and len(animal['locations']) > 0:
+    if 'locations' in animal and animal['locations']:
         output_animals += f"<strong>Location:</strong> {escape_html(animal['locations'][0])}<br/>\n"
 
     if "characteristics" in animal and "type" in animal["characteristics"]:
         output_animals += f"<strong>Type:</strong> {escape_html(animal['characteristics']['type'])}<br/>\n"
 
-    output_animals += '</p>\n'
-    output_animals += '</li>\n'
-    output_animals += "\n"
-
+    output_animals += '</p>\n</li>\n'  # Korrektur hier
     return output_animals
 
 
 def generate_website(animal_name):
-    # Holt die Tiersdaten für das angegebene Tier
     animals_data = data_fetcher.fetch_data(animal_name)
-
     if not animals_data:
         print("Daten nicht gefunden.")
         return
 
-    # HTML-Vorlage laden
-    try:
-        with open("animals.html", "r") as file:
-            template_content = file.read()
-    except FileNotFoundError:
-        print("Fehler: animals.html-Datei nicht gefunden.")
+    template_file = "animals_site.html"  # Verwenden der Vorlage
+    output_file = "animals.html"  # Die generierte Datei
+
+    if not os.path.exists(template_file):
+        print(f"Fehler: {template_file} nicht gefunden.")
         return
 
-    output_animals = ''
-    for animal in animals_data:
-        output_animals += serialize_animal(animal)
+    with open(template_file, "r", encoding="utf-8") as file:
+        template_content = file.read()
 
-    # Platzhalter in der Vorlage ersetzen
+    output_animals = ''.join(serialize_animal(animal) for animal in animals_data)
     html_content = template_content.replace("__REPLACE_ANIMALS_INFO__", output_animals)
 
-    # Neue HTML-Datei schreiben
-    try:
-        with open("animals.html", "w") as file:
-            file.write(html_content)
-        print("Website wurde erfolgreich in die Datei animals.html generiert.")
-    except IOError as e:
-        print(f"Fehler beim Schreiben der Datei: {e}")
+    with open(output_file, "w", encoding="utf-8") as file:
+        file.write(html_content)
+
+    print(f"Website erfolgreich generiert: {output_file}")
 
 
-# Beispielaufruf für "fox"
 if __name__ == "__main__":
     animal_name = input("Enter the name of an animal: ")
     generate_website(animal_name)
